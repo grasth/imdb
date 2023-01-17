@@ -12,45 +12,41 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        System.out.println(
-                "[1] - insert data to db\n" +
-                "[2] - enter sql\n"
-        );
+        while(true) {
+            System.out.println(
+                    "[1] - insert data to db\n" +
+                            "[2] - enter sql\n" +
+                            "[3] - leave\n"
+            );
 
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(System.in));
-        String action = reader.readLine();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(System.in));
+            String action = reader.readLine();
 
-        switch (action){
-            case "1":
-                checkTable();
-                getImdb();
-                break;
-            case "2":
-                String sql = reader.readLine();
-                goSql(sql);
-                break;
+            switch (action) {
+                case "1":
+                    checkTable();
+                    getImdb();
+                    break;
+                case "2":
+                    String sql = reader.readLine();
+                    goSql(sql);
+                    break;
+                case "3":
+                    return;
+            }
         }
+
     }
 
     public static void goSql(String sql){
         DBConnect.printSql(sql);
     }
 
-    public static void checkConnect(){
-        System.out.println(DBConnect.hasConnect());
-    }
-
     public static void checkTable(){
         try {
-            if (!DBConnect.tableExistsSQL()){
-                DBConnect.createTable();
-                System.out.println("Table created");
-            } else {
-                System.out.println("Table imdb exists");
-            }
+            DBConnect.createTableIfNotExists();
         } catch (Exception e){
-            System.out.println("тут");
             System.out.println(e.getMessage());
         }
     }

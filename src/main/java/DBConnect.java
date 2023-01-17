@@ -1,14 +1,12 @@
 import java.sql.*;
 import java.util.List;
 
-import org.postgresql.*;
-
 public class DBConnect {
 
     private static Connection connect() {
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/imdb", "postgres", "admin");
+            conn = DriverManager.getConnection("jdbc:mysql://sql8.freesqldatabase.com:3306/sql8591294", "sql8591294", "CAcU7XGhNj");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -16,35 +14,42 @@ public class DBConnect {
     }
 
     public static boolean hasConnect(){
-        return connect() == null ? false:true;
+        return connect() != null;
     }
 
-    static boolean tableExistsSQL() throws SQLException {
-        Connection connection = connect();
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT count(*) "
-                + "FROM information_schema.tables "
-                + "WHERE table_name = ?");
-
-        preparedStatement.setString(1, "imdb");
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-        resultSet.next();
-        connection.close();
-        return resultSet.getInt(1) != 0;
-    }
-
-    public static void createTable() {
-        String CreateSql = "Create Table imdb(id SERIAL PRIMARY KEY, name TEXT, age INT, rate REAL)";
-        try{
-            Connection connection = connect();
-            Statement stmt = connection.createStatement();
-            stmt.execute(CreateSql);
-            stmt.close();
-            connection.close();
+    private static boolean tableExists(Connection connection){
+        try {
+            boolean tExists = false;
+            try (ResultSet rs = connection.getMetaData().getTables(null, null, "imdb", null)) {
+                while (rs.next()) {
+                    String tName = rs.getString("TABLE_NAME");
+                    if (tName != null && tName.equals("imdb")) {
+                        tExists = true;
+                        break;
+                    }
+                }
+            }
+            return tExists;
         } catch (Exception e){
-            System.out.println(e.getMessage());
+            return false;
         }
-
+    }
+    static void createTableIfNotExists() throws SQLException {
+        Connection connection = connect();
+        if (!tableExists(connection)) {
+            String sqlCreateTableScheme = "CREATE TABLE imdb " +
+                    "(id INTEGER not NULL AUTO_INCREMENT, " +
+                    " name TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin, " +
+                    " age INTEGER, " +
+                    " rate FLOAT, " +
+                    " PRIMARY KEY ( id ))";
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(sqlCreateTableScheme);
+            connection.close();
+            System.out.println("Table created");
+        } else {
+            System.out.println("Table exists");
+        }
     }
 
     public static void insertData(List<Film> films){
@@ -84,8 +89,9 @@ public class DBConnect {
                     String columnValue = resultSet.getString(i);
                     System.out.print(columnValue);
                 }
-                System.out.println("");
+                System.out.println();
             }
+            System.out.println("================");
             connection.close();
         } catch (Exception e){
             System.out.println(e.getMessage());
