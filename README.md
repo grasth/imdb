@@ -24,4 +24,5 @@ Frameworks:
 Пример исполнения команды 2:
 
 ![image](https://user-images.githubusercontent.com/45192232/213996212-f4f22a0b-224d-4140-b39d-6aee933ff0b9.png)
+
 ![image](https://user-images.githubusercontent.com/45192232/213996226-10f1a327-d68d-4318-8d28-b0e79345361f.png)
